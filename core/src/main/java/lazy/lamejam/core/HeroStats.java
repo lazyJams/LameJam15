@@ -21,6 +21,10 @@ public class HeroStats {
 		abilities[index++] = ability;
 	}
 
+	public Ability getAbility(int index) {
+		return abilities[index];
+	}
+
 	public void useAbility(int index, HeroStats enemyStats) {
 		if (canUse(abilities[index].cost))
 			abilities[index].onUse(this, enemyStats);

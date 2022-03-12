@@ -2,8 +2,8 @@ package lazy.lamejam.core;
 
 public class DamageAbility extends Ability {
 
-	public DamageAbility(int uptime, int abilityPower, int cost) {
-		super(uptime, Type.HEAL, abilityPower, cost);
+	public DamageAbility(int uptime, int abilityPower, int cost, int key) {
+		super(uptime, Type.HEAL, abilityPower, cost, key);
 	}
 
 	@Override

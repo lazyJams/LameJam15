@@ -47,6 +47,11 @@ public class GdxHelper {
 		shapeRenderer.circle(transform.x, transform.y, 1);
 	}
 
+	public static void drawCircle(float x, float y, int radius, Color color) {
+		shapeRenderer.setColor(color);
+		shapeRenderer.circle(x, y, radius);
+	}
+
 	public static SpriteBatch spriteBatch() {
 		return batch;
 	}

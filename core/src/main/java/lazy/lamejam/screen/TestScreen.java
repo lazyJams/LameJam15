@@ -8,10 +8,18 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import lazy.lamejam.core.Ability;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Timer;
+import lazy.lamejam.core.AbilityButton;
 import lazy.lamejam.core.DamageAbility;
 import lazy.lamejam.core.HealAbility;
 import lazy.lamejam.core.HeroStats;
+import lazy.lamejam.util.TimedManager;
 import lazy.lamejam.util.Transform;
 
 import static lazy.lamejam.util.GdxHelper.*;
@@ -24,23 +32,43 @@ public class TestScreen extends ScreenAdapter {
 	private HeroStats stats;
 	private HeroStats enemyStats;
 
+	private Stage stage;
+	private Skin skin = new Skin(Gdx.files.internal("./ui/uiskin.json"));
+	private TimedManager manager = new TimedManager();
+
+
 	@Override
 	public void show() {
 		shapeRenderer = new ShapeRenderer();
 		spriteBatch = new SpriteBatch();
 		bitmapFont = new BitmapFont();
+		stage = new Stage();
 		stats = new HeroStats(1000, 1000);
-		stats.addAbility(new HealAbility(10,100, 100));
-		stats.addAbility(new DamageAbility(10,100, 100));
-		stats.addAbility(new HealAbility(10,100, 100));
-		stats.addAbility(new HealAbility(10,100, 100));
+		stats.addAbility(new HealAbility(3, 100, 100, Input.Keys.Q));
+		stats.addAbility(new DamageAbility(3, 100, 100, Input.Keys.W));
+		stats.addAbility(new HealAbility(10, 100, 100, Input.Keys.E));
+		stats.addAbility(new HealAbility(10, 100, 100, Input.Keys.R));
 		enemyStats = new HeroStats(1000, 1000);
+		Table table = new Table();
+		table.setPosition(center().x, center().y - 100);
+
+		table.add(new AbilityButton(stats.getAbility(HeroStats.Q), "Q", skin)).size(25, 25).pad(10);
+		table.add(new AbilityButton(stats.getAbility(HeroStats.W), "W", skin)).size(25, 25).pad(10);
+		table.add(new AbilityButton(stats.getAbility(HeroStats.E), "E", skin)).size(25, 25).pad(10);
+		table.add(new AbilityButton(stats.getAbility(HeroStats.R), "R", skin)).size(25, 25).pad(10);
+
+		stage.addActor(table);
+
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		stage.act();
+		stage.draw();
 
 		Transform hero = new Transform(center().x - 75, center().y - 25, 50, 50);
 		Transform enemyHero = new Transform(center().x + 25, center().y - 25, 50, 50);
@@ -55,12 +83,10 @@ public class TestScreen extends ScreenAdapter {
 		drawText(enemyHero.x, enemyHero.yRelative(90), "Mana: " + enemyStats.getMana(), Color.WHITE);
 		endDrawing();
 
-		if(Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
 			stats.useAbility(HeroStats.Q, enemyStats);
-		} else {
-			if(Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-				stats.useAbility(HeroStats.W, enemyStats);
-			}
+		} else if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+			stats.useAbility(HeroStats.W, enemyStats);
 		}
 	}
 
