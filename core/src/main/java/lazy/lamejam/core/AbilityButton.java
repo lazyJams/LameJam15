@@ -18,7 +18,10 @@ public class AbilityButton extends TextButton {
 	private float timer;
 	private String original;
 
-	public AbilityButton(Ability ability, String text, Skin skin) {
+	// FIXME: 13/03/2022 I dont like the idea of passing the stats to the button itself,
+	// but its a game jam no one cares right?
+
+	public AbilityButton(Ability ability, String text, Skin skin, HeroStats stats, HeroStats enemyStats) {
 		super(text, skin);
 		this.original = text;
 		this.ability = ability;
@@ -26,14 +29,16 @@ public class AbilityButton extends TextButton {
 		addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				setDisabled(true);
-				currentTime = ability.uptime;
-				Timer.schedule(new Timer.Task() {
-					@Override
-					public void run() {
-						setDisabled(false);
-					}
-				}, ability.uptime);
+				if(ability.onUse(stats, enemyStats) == Ability.Result.OK) {
+					setDisabled(true);
+					currentTime = ability.uptime;
+					Timer.schedule(new Timer.Task() {
+						@Override
+						public void run() {
+							setDisabled(false);
+						}
+					}, ability.uptime);
+				}
 			}
 		});
 	}
@@ -47,6 +52,7 @@ public class AbilityButton extends TextButton {
 		}
 
 		if(currentTime > 0) {
+			setText("" + currentTime);
 			timer += Gdx.graphics.getDeltaTime();
 			if(timer >= 1) {
 				currentTime--;
@@ -60,7 +66,7 @@ public class AbilityButton extends TextButton {
 		}
 	}
 
-	public ClickListener getFromList() {
+	private ClickListener getFromList() {
 		AtomicReference<ClickListener> tmp = new AtomicReference<>();
 		getListeners().forEach(l -> {
 			if (l instanceof ClickListener) {

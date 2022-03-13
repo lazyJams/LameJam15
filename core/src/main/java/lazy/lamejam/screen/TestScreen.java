@@ -36,6 +36,7 @@ public class TestScreen extends ScreenAdapter {
 	private Skin skin = new Skin(Gdx.files.internal("./ui/uiskin.json"));
 	private TimedManager manager = new TimedManager();
 
+	private float regenTimer;
 
 	@Override
 	public void show() {
@@ -43,19 +44,19 @@ public class TestScreen extends ScreenAdapter {
 		spriteBatch = new SpriteBatch();
 		bitmapFont = new BitmapFont();
 		stage = new Stage();
-		stats = new HeroStats(1000, 1000);
+		stats = new HeroStats(1000, 1000, 10.0f, 2.0f);
 		stats.addAbility(new HealAbility(3, 100, 100, Input.Keys.Q));
 		stats.addAbility(new DamageAbility(3, 100, 100, Input.Keys.W));
 		stats.addAbility(new HealAbility(10, 100, 100, Input.Keys.E));
 		stats.addAbility(new HealAbility(10, 100, 100, Input.Keys.R));
-		enemyStats = new HeroStats(1000, 1000);
+		enemyStats = new HeroStats(1000, 1000, 2f, 3.2f);
 		Table table = new Table();
 		table.setPosition(center().x, center().y - 100);
 
-		table.add(new AbilityButton(stats.getAbility(HeroStats.Q), "Q", skin)).size(25, 25).pad(10);
-		table.add(new AbilityButton(stats.getAbility(HeroStats.W), "W", skin)).size(25, 25).pad(10);
-		table.add(new AbilityButton(stats.getAbility(HeroStats.E), "E", skin)).size(25, 25).pad(10);
-		table.add(new AbilityButton(stats.getAbility(HeroStats.R), "R", skin)).size(25, 25).pad(10);
+		table.add(new AbilityButton(stats.getAbility(HeroStats.Q), "Q", skin, stats, enemyStats)).size(25, 25).pad(10);
+		table.add(new AbilityButton(stats.getAbility(HeroStats.W), "W", skin, stats, enemyStats)).size(25, 25).pad(10);
+		table.add(new AbilityButton(stats.getAbility(HeroStats.E), "E", skin, stats, enemyStats)).size(25, 25).pad(10);
+		table.add(new AbilityButton(stats.getAbility(HeroStats.R), "R", skin, stats, enemyStats)).size(25, 25).pad(10);
 
 		stage.addActor(table);
 
@@ -66,6 +67,13 @@ public class TestScreen extends ScreenAdapter {
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		regenTimer += delta;
+		if(regenTimer >= 1){
+			stats.regen();
+			enemyStats.regen();
+			regenTimer = 0;
+		}
 
 		stage.act();
 		stage.draw();
@@ -82,12 +90,6 @@ public class TestScreen extends ScreenAdapter {
 		drawText(enemyHero.x, enemyHero.yRelative(70), "Health: " + enemyStats.getHealth(), Color.WHITE);
 		drawText(enemyHero.x, enemyHero.yRelative(90), "Mana: " + enemyStats.getMana(), Color.WHITE);
 		endDrawing();
-
-		if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-			stats.useAbility(HeroStats.Q, enemyStats);
-		} else if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-			stats.useAbility(HeroStats.W, enemyStats);
-		}
 	}
 
 	@Override

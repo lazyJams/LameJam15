@@ -1,5 +1,7 @@
 package lazy.lamejam.core;
 
+import static lazy.lamejam.core.Ability.Result.OK;
+
 public class DamageAbility extends Ability {
 
 	public DamageAbility(int uptime, int abilityPower, int cost, int key) {
@@ -7,8 +9,9 @@ public class DamageAbility extends Ability {
 	}
 
 	@Override
-	public void onUse(HeroStats stats, HeroStats enemyStats) {
+	public Result onUse(HeroStats stats, HeroStats enemyStats) {
 		stats.relativeManaChange(-this.cost);
 		enemyStats.relativeHealthChange(-this.abilityPower);
+		return OK;
 	}
 }

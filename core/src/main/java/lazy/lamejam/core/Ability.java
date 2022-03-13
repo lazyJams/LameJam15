@@ -14,6 +14,11 @@ public abstract class Ability {
 		HEAL
 	}
 
+	public enum Result {
+		OK,
+		PASS
+	}
+
 	public Ability(int uptime, Type type, int abilityPower, int cost, int key) {
 		this.uptime = uptime;
 		this.type = type;
@@ -22,5 +27,5 @@ public abstract class Ability {
 		this.key = key;
 	}
 
-	public abstract void onUse(HeroStats stats, HeroStats enemyStats);
+	public abstract Result onUse(HeroStats stats, HeroStats enemyStats);
 }
